@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>G-Menus - Food Near Me</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #fff; }
+    header { background: #4CAF50; color: white; padding: 1em; text-align: center; }
+    main { padding: 1em; }
+    input[type="text"] { width: 80%; padding: 0.5em; margin-right: 0.5em; }
+    button { padding: 0.5em 1em; background: #4CAF50; color: white; border: none; cursor: pointer; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 0.5em 0; border-bottom: 1px solid #ddd; }
+    footer { background: #f1f1f1; text-align: center; padding: 1em; margin-top: 2em; font-size: 0.9em; color: #555; }
+  </style>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAGhYvs8cxs_VBa_1DX07asAW56H1lmHdo&libraries=places"></script>
+</head>
+<body>
+  <header>
+    <h1>G-Menus</h1>
+    <p>Find Food Near You</p>
+  </header>
+  <main>
+    <input id="locationInput" type="text" placeholder="Enter your location" />
+    <button onclick="searchPlaces()">Search</button>
+    <ul id="results"></ul>
+  </main>
+  <footer>
+    Contact: owner.g.menus@gmail.com
+  </footer>
+
+  <script>
+    function searchPlaces() {
+      const location = document.getElementById('locationInput').value;
+      if (!location) {
+        alert('Please enter a location');
+        return;
+      }
+      const service = new google.maps.places.PlacesService(document.createElement('div'));
+      const request = {
+        query: 'restaurants near ' + location,
+        fields: ['name', 'formatted_address'],
+      };
+      service.findPlaceFromQuery(request, function(results, status) {
+        const resultsList = document.getElementById('results');
+        resultsList.innerHTML = '';
+        if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+          results.forEach(place => {
+            const li = document.createElement('li');
+            li.textContent = `${place.name} — ${place.formatted_address}`;
+            resultsList.appendChild(li);
+          });
+        } else {
+          resultsList.innerHTML = '<li>No results found.</li>';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
