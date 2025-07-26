@@ -5,14 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>G-Menus - Food Near Me</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #fff; }
-    header { background: #4CAF50; color: white; padding: 1em; text-align: center; }
-    main { padding: 1em; }
-    input[type="text"] { width: 80%; padding: 0.5em; margin-right: 0.5em; }
-    button { padding: 0.5em 1em; background: #4CAF50; color: white; border: none; cursor: pointer; }
-    ul { list-style: none; padding: 0; }
-    li { padding: 0.5em 0; border-bottom: 1px solid #ddd; }
-    footer { background: #f1f1f1; text-align: center; padding: 1em; margin-top: 2em; font-size: 0.9em; color: #555; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      background: #fff;
+    }
+    header {
+      background: #4CAF50;
+      color: white;
+      padding: 1em;
+      text-align: center;
+    }
+    main {
+      padding: 1em;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 0.6em;
+      margin-right: 0.5em;
+      font-size: 1em;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 0.6em 1em;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 1em;
+    }
+    li {
+      padding: 0.75em 0;
+      border-bottom: 1px solid #ddd;
+      font-size: 1em;
+    }
+    footer {
+      background: #f1f1f1;
+      text-align: center;
+      padding: 1em;
+      margin-top: 2em;
+      font-size: 0.9em;
+      color: #555;
+    }
+    #loading {
+      display: none;
+      margin-top: 1em;
+      color: #666;
+    }
   </style>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAGhYvs8cxs_VBa_1DX07asAW56H1lmHdo&libraries=places"></script>
 </head>
@@ -24,6 +68,7 @@
   <main>
     <input id="locationInput" type="text" placeholder="Enter your location" />
     <button onclick="searchPlaces()">Search</button>
+    <div id="loading">Searching nearby restaurants...</div>
     <ul id="results"></ul>
   </main>
   <footer>
@@ -31,28 +76,47 @@
   </footer>
 
   <script>
+    const geocoder = new google.maps.Geocoder();
+    const placesService = new google.maps.places.PlacesService(document.createElement('div'));
+
     function searchPlaces() {
-      const location = document.getElementById('locationInput').value;
+      const location = document.getElementById('locationInput').value.trim();
+      const resultsList = document.getElementById('results');
+      const loadingIndicator = document.getElementById('loading');
+      resultsList.innerHTML = '';
+
       if (!location) {
         alert('Please enter a location');
         return;
       }
-      const service = new google.maps.places.PlacesService(document.createElement('div'));
-      const request = {
-        query: 'restaurants near ' + location,
-        fields: ['name', 'formatted_address'],
-      };
-      service.findPlaceFromQuery(request, function(results, status) {
-        const resultsList = document.getElementById('results');
-        resultsList.innerHTML = '';
-        if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
-          results.forEach(place => {
-            const li = document.createElement('li');
-            li.textContent = `${place.name} — ${place.formatted_address}`;
-            resultsList.appendChild(li);
+
+      loadingIndicator.style.display = 'block';
+
+      geocoder.geocode({ address: location }, (results, status) => {
+        if (status === 'OK' && results.length > 0) {
+          const latlng = results[0].geometry.location;
+
+          const request = {
+            location: latlng,
+            radius: 5000, // 5km radius
+            type: ['restaurant'],
+          };
+
+          placesService.nearbySearch(request, (places, status) => {
+            loadingIndicator.style.display = 'none';
+            if (status === google.maps.places.PlacesServiceStatus.OK && places.length > 0) {
+              placesList = places.map(place => {
+                return `<li><strong>${place.name}</strong><br>${place.vicinity || ''}</li>`;
+              }).join('');
+              resultsList.innerHTML = placesList;
+            } else {
+              resultsList.innerHTML = '<li>No restaurants found near this location.</li>';
+            }
           });
+
         } else {
-          resultsList.innerHTML = '<li>No results found.</li>';
+          loadingIndicator.style.display = 'none';
+          alert('Could not find the location. Please enter a valid address.');
         }
       });
     }
