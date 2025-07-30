@@ -1,131 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>G-Menus | Food Near Me</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>G-Menus - Food Near Me</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: Arial, sans-serif;
+      background: #f8fafc;
       margin: 0;
-      padding: 0;
-      background: #fefefe;
-      color: #333;
-      text-align: center;
+      padding: 2rem;
+      color: #111;
     }
-    header {
-      background: #ff7b54;
-      color: white;
-      padding: 1.2rem;
-      font-size: 1.5rem;
-      font-weight: bold;
+    h1 {
+      color: #f43f5e;
+      font-size: 2rem;
     }
-    main {
-      padding: 1rem;
-    }
-    input[type="text"] {
-      padding: 0.6rem;
+    #searchBox {
+      padding: 0.5rem;
       font-size: 1rem;
       width: 80%;
-      max-width: 400px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
       margin-bottom: 1rem;
     }
-    .results {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
+    #results {
+      margin-top: 1rem;
     }
-    .place-card {
-      background: #fff7f3;
-      border: 1px solid #ffe0d3;
+    #log {
+      background: #fff3cd;
       padding: 1rem;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .place-card img {
-      max-width: 100%;
+      border: 1px solid #ffeeba;
       border-radius: 8px;
-    }
-    .loading {
-      font-style: italic;
-      color: #888;
+      margin-top: 2rem;
     }
   </style>
 </head>
 <body>
+  <h1>🍽️ G-Menus</h1>
+  <input id="searchBox" placeholder="Enter location (e.g. Accra, New York)" />
+  <button onclick="searchPlaces()">Search</button>
+  <div id="results"></div>
+  <div id="log"></div>  <script>
+    const apiKey = "AIzaSyAGhYvs8cxs_VBa_1DX07asAW56H1lmHdo"; // Replace with secure key later
 
-<header>🍽️ G-Menus: Food Near Me</header>
+    async function searchPlaces() {
+      const location = document.getElementById('searchBox').value;
+      const log = document.getElementById('log');
+      const results = document.getElementById('results');
+      results.innerHTML = 'Searching...';
+      log.innerHTML = '';
 
-<main>
-  <input id="location-input" type="text" placeholder="Enter a city or location" />
-  <div class="loading" id="loading">Waiting for search...</div>
-  <div class="results" id="results"></div>
-</main>
+      if (!location) {
+        results.innerHTML = '❌ Please enter a location.';
+        return;
+      }
 
-<script>
-  const apiKey = "AIzaSyAGhYvs8cxs_VBa_1DX07asAW56H1lmHdo";
-  const input = document.getElementById("location-input");
-  const loading = document.getElementById("loading");
-  const results = document.getElementById("results");
+      try {
+        const geoResponse = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${apiKey}`
+        );
+        const geoData = await geoResponse.json();
 
-  input.addEventListener("change", async () => {
-    const address = input.value.trim();
-    if (!address) return;
-
-    loading.textContent = "Searching for restaurants near " + address + "...";
-    results.innerHTML = "";
-
-    // Step 1: Geocode the address
-    const geocodeURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
-    const geoRes = await fetch(geocodeURL);
-    const geoData = await geoRes.json();
-
-    if (geoData.status !== "OK") {
-      loading.textContent = "Location not found.";
-      return;
+        if (geoData.status !== 'OK') {
+          results.innerHTML = `❌ Location not found: ${geoData.status}`;
+          log.innerHTML = `🔍 Geocoding error: ${geoData.status}<br><pre>${JSON.stringify(geoData.error_message || '', null, 2)}</pre>`;return;
     }
 
     const { lat, lng } = geoData.results[0].geometry.location;
 
-    // Step 2: Search for restaurants near the location
-    const placesURL = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1500&type=restaurant&key=${apiKey}`;
-    const proxy = "https://corsproxy.io/?"; // Bypass CORS for local test
-    const placeRes = await fetch(proxy + placesURL);
-    const placeData = await placeRes.json();
+    const placesResponse = await fetch(
+      `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=restaurant&key=${apiKey}`
+    );
+    const placesData = await placesResponse.json();
 
-    if (placeData.status !== "OK") {
-      loading.textContent = "No results found.";
+    if (placesData.status !== 'OK') {
+      results.innerHTML = `❌ Places API error: ${placesData.status}`;
+      log.innerHTML += `<br>🔧 Places API error: ${placesData.status}<br><pre>${JSON.stringify(placesData.error_message || '', null, 2)}</pre>`;
       return;
     }
 
-    loading.textContent = `Found ${placeData.results.length} places`;
+    results.innerHTML = '<ul>' + placesData.results.map(place => `<li>${place.name}</li>`).join('') + '</ul>';
+  } catch (err) {
+    results.innerHTML = '❌ Something went wrong.';
+    log.innerHTML = `<pre>${err.message}</pre>`;
+  }
 
-    // Step 3: Render results
-    placeData.results.forEach(place => {
-      const div = document.createElement("div");
-      div.className = "place-card";
+  // Log your current referrer for debugging
+  log.innerHTML += `<br>🌐 Referrer: <code>${document.referrer || '(none - direct access)'}</code>`;
+}
 
-      const photo = place.photos?.[0]
-        ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${apiKey}`
-        : "";
-
-      div.innerHTML = `
-        <h3>${place.name}</h3>
-        ${photo ? `<img src="${photo}" alt="${place.name}" />` : ""}
-        <p>⭐ ${place.rating || "N/A"} — ${place.user_ratings_total || 0} reviews</p>
-        <p>${place.vicinity}</p>
-        <p>${place.opening_hours?.open_now ? "🟢 Open Now" : "🔴 Closed"}</p>
-      `;
-
-      results.appendChild(div);
-    });
-  });
-</script>
-
+  </script>
 </body>
 </html>
