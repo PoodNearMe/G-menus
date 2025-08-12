@@ -1,92 +1,214 @@
-<!DOCTYPE html><html lang="en">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>G-Menus - Food Near Me</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LifeSparkHQ — Hacks, Tips & Ideas That Make Life Easier</title>
+  <meta name="description" content="LifeSparkHQ: clever everyday hacks for money, home, food, travel and tech. Get smarter, simpler living ideas with beautiful how-tos." />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f8fafc;
-      margin: 0;
-      padding: 2rem;
-      color: #111;
+    :root{
+      --bg:#fbfbfc;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent1:#ffb86b; /* warm peach */
+      --accent2:#3b82f6; /* calm blue */
+      --accent3:#10b981; /* fresh green */
+      --glass: rgba(255,255,255,0.6);
+      --radius:18px;
+      --shadow: 0 8px 30px rgba(18,25,40,0.06);
+      --maxw:1200px;
+      --container-padding:24px;
     }
-    h1 {
-      color: #f43f5e;
-      font-size: 2rem;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+      background:linear-gradient(180deg,#ffffff 0%, #fbfbfd 100%);
+      color:#0f172a;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.5;
     }
-    #searchBox {
-      padding: 0.5rem;
-      font-size: 1rem;
-      width: 80%;
-      margin-bottom: 1rem;
-    }
-    #results {
-      margin-top: 1rem;
-    }
-    #log {
-      background: #fff3cd;
-      padding: 1rem;
-      border: 1px solid #ffeeba;
-      border-radius: 8px;
-      margin-top: 2rem;
+    .container{max-width:var(--maxw);margin:0 auto;padding:var(--container-padding)}
+    header{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
+    .logo{display:flex;gap:12px;align-items:center}
+    .logo .mark{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-family:Playfair Display;font-size:20px;box-shadow:var(--shadow)}
+    nav{display:flex;gap:18px;align-items:center;font-weight:600;color:var(--muted)}
+    .search{margin-left:18px;flex:1;max-width:420px}
+    .search input{width:100%;padding:10px 14px;border-radius:12px;border:1px solid #e6e9ee;background:transparent}
+    .hero{display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:center;margin:18px 0}
+    .hero-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;padding:28px}
+    .hero-card h1{font-family:Playfair Display;font-size:36px;margin:0 0 12px}
+    .hero-card p{color:var(--muted);margin:0 0 18px}
+    .cta{display:inline-block;padding:12px 18px;border-radius:12px;background:linear-gradient(90deg,var(--accent2),var(--accent3));color:white;font-weight:700;text-decoration:none}
+    /* Featured categories */
+    .cats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+    .cat{display:flex;gap:12px;align-items:center;padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(59,130,246,0.06), rgba(16,185,129,0.03));}
+    .cat .icon{width:56px;height:56px;border-radius:12px;background:var(--glass);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px}
+    /* Trending carousel */
+    .trending{margin-top:24px;display:flex;gap:12px;overflow:auto;padding-bottom:8px}
+    .trend-card{min-width:260px;background:var(--card);border-radius:14px;padding:12px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:center}
+    .trend-card img{width:92px;height:72px;border-radius:10px;object-fit:cover}
+    /* Feed */
+    .grid{display:grid;grid-template-columns:2fr 360px;gap:20px;margin-top:22px}
+    .feed{display:grid;gap:12px}
+    .post{display:flex;gap:14px;background:var(--card);padding:12px;border-radius:12px;box-shadow:var(--shadow);align-items:center}
+    .post img{width:140px;height:96px;border-radius:10px;object-fit:cover}
+    .post h3{margin:0;font-size:18px}
+    .sidebar{position:relative;padding:12px;display:flex;flex-direction:column;gap:14px}
+    .newsletter{background:linear-gradient(90deg,#fff,#f8fafc);padding:16px;border-radius:12px;box-shadow:var(--shadow)}
+    footer{margin-top:36px;padding:28px 0;color:var(--muted);font-size:14px}
+    /* responsive */
+    @media (max-width:980px){
+      .hero{grid-template-columns:1fr; }
+      .grid{grid-template-columns:1fr}
+      .trending{padding-left:0}
+      nav{display:none}
     }
   </style>
 </head>
 <body>
-  <h1>🍽️ G-Menus</h1>
-  <input id="searchBox" placeholder="Enter location (e.g. Accra, New York)" />
-  <button onclick="searchPlaces()">Search</button>
-  <div id="results"></div>
-  <div id="log"></div>  <script>
-    const apiKey = "AIzaSyAGhYvs8cxs_VBa_1DX07asAW56H1lmHdo"; // Replace with secure key later
+  <div class="container">
+    <header>
+      <div class="logo">
+        <div class="mark">LS</div>
+        <div>
+          <div style="font-weight:800;font-family:Playfair Display;font-size:18px">LifeSparkHQ</div>
+          <div style="font-size:12px;color:var(--muted)">Hacks, tips & ideas that make life easier</div>
+        </div>
+      </div>
 
-    async function searchPlaces() {
-      const location = document.getElementById('searchBox').value;
-      const log = document.getElementById('log');
-      const results = document.getElementById('results');
-      results.innerHTML = 'Searching...';
-      log.innerHTML = '';
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="search"><input placeholder="Search hacks, recipes, money tips..." aria-label="Search"></div>
+        <div style="font-weight:700;color:var(--accent2);">Sign in</div>
+      </div>
+    </header>
 
-      if (!location) {
-        results.innerHTML = '❌ Please enter a location.';
-        return;
-      }
+    <main>
+      <section class="hero">
+        <div class="hero-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+            <div>
+              <h1>10 Kitchen Hacks You’ll Wish You Knew Yesterday</h1>
+              <p>Quick wins for cooking, storage, and zero-waste that actually work. Beautifully photographed — and painfully simple.</p>
+              <a href="/10-kitchen-hacks" class="cta">Read the guide</a>
+            </div>
+            <!-- Leaderboard ad slot (desktop) -->
+          </div>
 
-      try {
-        const geoResponse = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${apiKey}`
-        );
-        const geoData = await geoResponse.json();
+          <div class="cats" aria-hidden="true" style="margin-top:20px">
+            <div class="cat"><div class="icon">$</div><div><strong>Smart Money</strong><div style="font-size:12px;color:var(--muted)">Saving & deals</div></div></div>
+            <div class="cat"><div class="icon">🏡</div><div><strong>Home & Living</strong><div style="font-size:12px;color:var(--muted)">Organize & clean</div></div></div>
+            <div class="cat"><div class="icon">🍳</div><div><strong>Food & Kitchen</strong><div style="font-size:12px;color:var(--muted)">Fast & tasty</div></div></div>
+          </div>
+        </div>
 
-        if (geoData.status !== 'OK') {
-          results.innerHTML = `❌ Location not found: ${geoData.status}`;
-          log.innerHTML = `🔍 Geocoding error: ${geoData.status}<br><pre>${JSON.stringify(geoData.error_message || '', null, 2)}</pre>`;return;
-    }
+        <aside>
+          <div style="background:linear-gradient(180deg,var(--accent1),var(--accent2));border-radius:18px;padding:18px;color:white;box-shadow:var(--shadow)">
+            <h3 style="margin:0 0 6px;font-family:Playfair Display">Join 50k+ readers</h3>
+            <p style="margin:0 0 12px;font-size:14px;opacity:0.95">Get our 3 top hacks every week — no fluff.</p>
+            <form>
+              <input placeholder="Email address" style="width:100%;padding:10px;border-radius:10px;border:none;margin-bottom:8px" />
+              <button style="width:100%;padding:10px;border-radius:10px;border:none;background:rgba(255,255,255,0.14);color:white;font-weight:700">Subscribe</button>
+            </form>
+          </div>
 
-    const { lat, lng } = geoData.results[0].geometry.location;
+          <!-- Mobile leaderboard ad (replace with responsive ad code) -->
+          <div style="margin-top:12px;background:var(--card);padding:12px;border-radius:12px;box-shadow:var(--shadow);text-align:center;color:var(--muted)">Ad slot (300×250)</div>
+        </aside>
+      </section>
 
-    const placesResponse = await fetch(
-      `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=restaurant&key=${apiKey}`
-    );
-    const placesData = await placesResponse.json();
+      <section style="margin-top:8px">
+        <h2 style="margin:0 0 10px">Trending Now</h2>
+        <div class="trending">
+          <div class="trend-card">
+            <img src="https://source.unsplash.com/collection/190727/260x160" alt="Coffee brew">
+            <div>
+              <div style="font-weight:700">The $5 Coffee Hack That Saves Time</div>
+              <div style="font-size:13px;color:var(--muted)">2.4k shares</div>
+            </div>
+          </div>
+          <div class="trend-card">
+            <img src="https://source.unsplash.com/collection/1114840/260x160" alt="Packing">
+            <div>
+              <div style="font-weight:700">Pack 2 Weeks in a Carry-On</div>
+              <div style="font-size:13px;color:var(--muted)">1.9k shares</div>
+            </div>
+          </div>
+          <div class="trend-card">
+            <img src="https://source.unsplash.com/collection/827743/260x160" alt="Money">
+            <div>
+              <div style="font-weight:700">Save $300 This Month With This Trick</div>
+              <div style="font-size:13px;color:var(--muted)">4.1k shares</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-    if (placesData.status !== 'OK') {
-      results.innerHTML = `❌ Places API error: ${placesData.status}`;
-      log.innerHTML += `<br>🔧 Places API error: ${placesData.status}<br><pre>${JSON.stringify(placesData.error_message || '', null, 2)}</pre>`;
-      return;
-    }
+      <section class="grid">
+        <div>
+          <div class="feed">
+            <article class="post">
+              <img src="https://source.unsplash.com/featured/?kitchen" alt="Kitchen hack">
+              <div>
+                <h3>10 Kitchen Hacks That Will Change The Way You Cook</h3>
+                <p style="color:var(--muted);margin:6px 0 0;font-size:14px">Speed up prep, reduce waste, make meals taste better — and look great doing it.</p>
+              </div>
+            </article>
 
-    results.innerHTML = '<ul>' + placesData.results.map(place => `<li>${place.name}</li>`).join('') + '</ul>';
-  } catch (err) {
-    results.innerHTML = '❌ Something went wrong.';
-    log.innerHTML = `<pre>${err.message}</pre>`;
-  }
+            <article class="post">
+              <img src="https://source.unsplash.com/featured/?budget" alt="Smart money">
+              <div>
+                <h3>7 Surprising Ways to Save $100 This Month</h3>
+                <p style="color:var(--muted);margin:6px 0 0;font-size:14px">Small changes, big savings — real tips that work while you sleep.</p>
+              </div>
+            </article>
 
-  // Log your current referrer for debugging
-  log.innerHTML += `<br>🌐 Referrer: <code>${document.referrer || '(none - direct access)'}</code>`;
-}
+            <article class="post">
+              <img src="https://source.unsplash.com/featured/?packing" alt="Travel hack">
+              <div>
+                <h3>How to Pack 2 Weeks Worth of Clothes in One Bag</h3>
+                <p style="color:var(--muted);margin:6px 0 0;font-size:14px">A tested minimalist packing method that actually fits.</p>
+              </div>
+            </article>
+          </div>
+        </div>
 
-  </script>
+        <aside class="sidebar">
+          <div style="background:var(--card);padding:12px;border-radius:12px;box-shadow:var(--shadow)">
+            <h4 style="margin:0 0 6px">Popular</h4>
+            <ol style="padding-left:16px;margin:0;color:var(--muted)">
+              <li><a href="#" style="color:inherit;text-decoration:none">10 Life-Saving Kitchen Hacks</a></li>
+              <li><a href="#" style="color:inherit;text-decoration:none">The $5 Coffee Trick</a></li>
+              <li><a href="#" style="color:inherit;text-decoration:none">A Week of Quick Dinners</a></li>
+            </ol>
+          </div>
+
+          <div class="newsletter">
+            <strong>Editor's Pick</strong>
+            <div style="margin-top:8px;color:var(--muted)">How to speed up your Wi-Fi without paying more — tested tips and router tweaks</div>
+          </div>
+
+          <div style="background:var(--card);padding:10px;border-radius:12px;box-shadow:var(--shadow);text-align:center">Sidebar Ad (300×600)</div>
+        </aside>
+      </section>
+
+    </main>
+
+    <footer>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+        <div>
+          © <strong>LifeSparkHQ</strong> — Hacks, tips & ideas that make life easier.
+        </div>
+        <div style="display:flex;gap:14px">
+          <a href="/about" style="color:var(--muted);text-decoration:none">About</a>
+          <a href="/privacy" style="color:var(--muted);text-decoration:none">Privacy</a>
+          <a href="/contact" style="color:var(--muted);text-decoration:none">Contact</a>
+        </div>
+      </div>
+    </footer>
+  </div>
 </body>
 </html>
